@@ -12,5 +12,8 @@
 </head>
 <body>
     <p>Hello from the other side!</p>
+    <form>
+        <input type="text" />
+    </form>
 </body>
 </html>
