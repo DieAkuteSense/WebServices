@@ -1,23 +1,29 @@
 package FuelPriceService;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Olli on 09.03.2016.
  */
-public class FuelPriceClient {
+
+public class FuelPriceClient extends HttpServlet {
     /**
      * Configuration
      */
     public static final String TANKERKOENIG_API_URL = "https://creativecommons.tankerkoenig.de/json/list.php";
     public static final String TANKERKOENIG_API_KEY = "00000000-0000-0000-0000-000000000002"; // just testing around ;)
- //   public static final String TANKERKOENIG_API_KEY = "671b939e-08ee-8807-be55-e1bd540c210b"; // get your own API key under https://creativecommons.tankerkoenig.de/#register
+  //  public static final String TANKERKOENIG_API_KEY = "671b939e-08ee-8807-be55-e1bd540c210b"; // get your own API key under https://creativecommons.tankerkoenig.de/#register
     public static final double CITY_LAT = 48.8088277717712;
     public static final double CITY_LON = 9.224395751953125;
     public static final int RADIUS = 2;
@@ -28,9 +34,7 @@ public class FuelPriceClient {
      * Configuration end
      */
 
-
-
-
+    private HttpServletRequest request = null;
 
     public FuelPriceClient() {
         final Client client = ClientBuilder.newClient();
@@ -40,9 +44,9 @@ public class FuelPriceClient {
     // TODO maybe return type should be a list of the stations
     public void requestCurrentFuelPrice(double lat, double lon, int rad, String type, String sort) {
         final Response response = wt.queryParam("lat", lat).queryParam("lng", lon).queryParam("rad", rad).queryParam("sort", sort).queryParam("type", type).request().get();
-        // System.out.println(response.toString());
+        //System.out.println(response.toString());
         final JsonObject jsonObject = Json.createReader(response.readEntity(InputStream.class)).readObject();
-        // System.out.println(jsonObject.toString());
+        //System.out.println(jsonObject.toString());
         final JsonArray mainData = jsonObject.getJsonArray("stations");
         final List<JsonObject> stations = getStations(mainData);
         getDetails(stations);
@@ -69,7 +73,7 @@ public class FuelPriceClient {
         sb.append("\nPrice: " + price);
         sb.append("\nStation ID: " + id);
         sb.append("\n-----------------------------------------------------------");
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
 
         return new StationData(name, lat, lon, brand, dist, price, id, street, houseNumber, postCode, place, isOpen);
     }
@@ -88,5 +92,9 @@ public class FuelPriceClient {
         JsonObject detailedInformation;
         detailedInformation = data.get(0);
         return jsonResponseToFuelPrice(detailedInformation);
+    }
+
+    public void hello() {
+        System.out.println("hello");
     }
 }

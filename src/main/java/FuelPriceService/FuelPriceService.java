@@ -1,4 +1,5 @@
 package FuelPriceService;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
@@ -9,7 +10,7 @@ import javax.xml.ws.Endpoint;
 @WebService()
 public class FuelPriceService {
   @WebMethod
-  public void getPriceInCity(String cityID) {
+  public static void getPriceInCity(String cityID) {
     FuelPriceClient fpc = new FuelPriceClient();
     fpc.requestCurrentFuelPrice(FuelPriceClient.CITY_LAT, FuelPriceClient.CITY_LON, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
   }

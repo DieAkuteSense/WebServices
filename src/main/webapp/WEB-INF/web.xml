@@ -5,7 +5,7 @@
 <web-app>
     <display-name>Price Service</display-name>
     <servlet>
-        <servlet-name>PriceService</servlet-name>
+        <servlet-name>FuelPriceService</servlet-name>
         <display-name>Price Service</display-name>
         <servlet-class>
             com.sun.xml.ws.transport.http.servlet.WSServlet
@@ -14,8 +14,8 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>PriceService</servlet-name>
-        <url-pattern>/services/*</url-pattern>
+        <servlet-name>FuelPriceService</servlet-name>
+        <url-pattern>/priceService/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

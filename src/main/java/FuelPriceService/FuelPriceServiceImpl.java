@@ -1,7 +1,10 @@
 package FuelPriceService;
 
+import javax.json.JsonObject;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by Olli on 09.03.2016.
