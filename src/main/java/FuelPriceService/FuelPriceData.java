@@ -1,4 +1,4 @@
-package FuelPriceService;
+package fuelPriceService;
 
 import java.util.List;
 

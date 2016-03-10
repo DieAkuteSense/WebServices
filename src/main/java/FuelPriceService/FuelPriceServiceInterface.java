@@ -1,4 +1,4 @@
-package FuelPriceService;
+package fuelPriceService;
 
 /**
  * Created by Olli on 09.03.2016.
