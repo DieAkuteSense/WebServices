@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<Classloading xmlns="http://wso2.org/projects/as/classloading">
-    <ParentFirst>false</ParentFirst>
-    <Environments>CXF,Carbon</Environments>
-</Classloading>

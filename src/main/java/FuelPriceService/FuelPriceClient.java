@@ -1,10 +1,8 @@
-package FuelPriceService;
+package fuelPriceService;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -13,11 +11,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Olli on 09.03.2016.
- */
 
-public class FuelPriceClient extends HttpServlet {
+public class FuelPriceClient {
     /**
      * Configuration
      */
@@ -33,8 +28,6 @@ public class FuelPriceClient extends HttpServlet {
     /**
      * Configuration end
      */
-
-    private HttpServletRequest request = null;
 
     public FuelPriceClient() {
         final Client client = ClientBuilder.newClient();
@@ -73,7 +66,7 @@ public class FuelPriceClient extends HttpServlet {
         sb.append("\nPrice: " + price);
         sb.append("\nStation ID: " + id);
         sb.append("\n-----------------------------------------------------------");
-        //System.out.println(sb.toString());
+        System.out.println(sb.toString());
 
         return new StationData(name, lat, lon, brand, dist, price, id, street, houseNumber, postCode, place, isOpen);
     }
@@ -92,9 +85,5 @@ public class FuelPriceClient extends HttpServlet {
         JsonObject detailedInformation;
         detailedInformation = data.get(0);
         return jsonResponseToFuelPrice(detailedInformation);
-    }
-
-    public void hello() {
-        System.out.println("hello");
     }
 }

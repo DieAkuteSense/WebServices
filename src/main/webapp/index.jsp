@@ -16,12 +16,11 @@
       xmlns:f="http://java.sun.com/jsf/core">
 <head>
     <title>Price Service</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
-<form action="test/getPriceInCity" method="post">
-    <input type="text" name="name" />
-    <input type="submit" value="Invoke" />
-</form>
+<h1>Hallo</h1>
+<p:getPriceInCity xmlns:p="http://fuelPriceService/">
+
+</p:getPriceInCity>
 </body>
 </html>
