@@ -18,9 +18,10 @@
     <title>Price Service</title>
 </head>
 <body>
-<h1>Hallo</h1>
-<p:getPriceInCity xmlns:p="http://fuelPriceService/">
-
-</p:getPriceInCity>
+<form action="services/rest/getPriceInCity" method="POST">
+    <input name="lat" />
+    <input name="lon" />
+    <input type="submit" />
+</form>
 </body>
 </html>

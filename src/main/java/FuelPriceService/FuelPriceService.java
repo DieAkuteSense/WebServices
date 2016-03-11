@@ -1,22 +1,26 @@
-package FuelPriceService;
+package fuelPriceService;
 
-import javax.jws.WebMethod;
+import javax.json.JsonArray;
 import javax.jws.WebService;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.xml.ws.Endpoint;
 
-/**
- * Created by Olli on 09.03.2016.
- */
-@WebService()
+@WebService
 public class FuelPriceService {
-  @WebMethod
-  public static void getPriceInCity(String cityID) {
+
+    @Path("/getPriceInCity")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+  public String getPriceInCity(@FormParam("lat") double lat, @FormParam("lon") double lon) {
     FuelPriceClient fpc = new FuelPriceClient();
-    fpc.requestCurrentFuelPrice(FuelPriceClient.CITY_LAT, FuelPriceClient.CITY_LON, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+    JsonArray jsonArray = fpc.requestCurrentFuelPrice(lat, lon, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+    return jsonArray.toString();
+
   }
   public static void main(String[] argv) {
     Object implementor = new FuelPriceService ();
-    String address = "http://localhost:9000/FuelPriceService";
+    String address = "http://localhost:9000/fuelPriceService";
     Endpoint.publish(address, implementor);
   }
 }

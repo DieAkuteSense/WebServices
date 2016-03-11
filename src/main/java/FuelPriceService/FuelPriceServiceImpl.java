@@ -1,27 +1,26 @@
-package FuelPriceService;
+package fuelPriceService;
 
-import javax.json.JsonObject;
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+import javax.jws.soap.SOAPBinding;
+import javax.ws.rs.POST;
 
-/**
- * Created by Olli on 09.03.2016.
- */
-@WebService(name = "priceService", serviceName = "priceService")
+@WebService()
 public class FuelPriceServiceImpl implements FuelPriceServiceInterface {
-    private final FuelPriceClient fpc = new FuelPriceClient();
+
+    private FuelPriceClient fpc = new FuelPriceClient();
 
     @Override
     @WebMethod
-    public String getVersion() {
+    public String returnVersion() {
         return "0.01 testing build";
     }
 
     @Override
-    public void requestCurrentPrice() throws FuelPriceServiceException {
-        FuelPriceClient fpc = new FuelPriceClient();
-        fpc.requestCurrentFuelPrice(FuelPriceClient.CITY_LAT, FuelPriceClient.CITY_LON, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+    @WebMethod
+    public double requestCurrentPrice(@WebParam(name="lat") double lat, @WebParam(name="lon") double lon) throws FuelPriceServiceException {
+        fpc.requestCurrentFuelPrice(lat, lon, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+        return lat;
     }
 }

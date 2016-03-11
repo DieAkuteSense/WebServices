@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans  xmlns="http://www.springframework.org/schema/beans"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:jaxws="http://cxf.apache.org/jaxws"
-        xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:ref="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://cxf.apache.org/jaxrs
+            http://cxf.apache.org/schemas/jaxrs.xsd
             http://cxf.apache.org/jaxws
             http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <jaxws:endpoint id="fuelService"
+    <jaxws:endpoint id="PriceServiceImpl"
                     implementor="fuelPriceService.FuelPriceServiceImpl"
-                    address="/fuelPriceService">
+                    address="/PriceServiceImpl">
     </jaxws:endpoint>
 
+    <jaxws:endpoint id="PriceService"
+                    implementor="fuelPriceService.FuelPriceService"
+                    address="/PriceService">
+    </jaxws:endpoint>
+
+    <jaxrs:server id="jaxrstest" address="/rest">
+        <jaxrs:serviceBeans>
+            <ref bean="jaxrsBean" />
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
+    <bean id="jaxrsBean" class="fuelPriceService.FuelPriceService" />
 </beans>

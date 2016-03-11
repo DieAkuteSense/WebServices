@@ -1,20 +1,24 @@
-<!DOCTYPE web-app PUBLIC
-        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        "http://java.sun.com/dtd/web-app_2_3.dtd" >
-
-<web-app>
-    <display-name>Price Service</display-name>
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>Web Service Application</display-name>
     <servlet>
-        <servlet-name>FuelPriceService</servlet-name>
-        <display-name>Just testing</display-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <servlet-name>services</servlet-name>
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
     <servlet-mapping>
-        <servlet-name>FuelPriceService</servlet-name>
-        <url-pattern>/services/</url-pattern>
+        <servlet-name>services</servlet-name>
+        <url-pattern>/services/*</url-pattern>
     </servlet-mapping>
-    <session-config>
-        <session-timeout>60</session-timeout>
-    </session-config>
+
+    <!-- For what I need the listener?
+        with listener not runnable on Tomcat
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    -->
 </web-app>
