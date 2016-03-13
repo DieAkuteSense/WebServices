@@ -23,8 +23,10 @@
     <jaxrs:server id="jaxrstest" address="/rest">
         <jaxrs:serviceBeans>
             <ref bean="jaxrsBean" />
+            <ref bean="jaxrsGeoLocation" />
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
     <bean id="jaxrsBean" class="fuelPriceService.FuelPriceService" />
+    <bean id="jaxrsGeoLocation" class="geolocation.GeoLocation" />
 </beans>

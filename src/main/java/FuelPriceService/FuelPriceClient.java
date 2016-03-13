@@ -37,15 +37,15 @@ public class FuelPriceClient {
     }
 
     // TODO maybe return type should be a list of the stations
-    public JsonArray requestCurrentFuelPrice(double lat, double lon, int rad, String type, String sort) {
+    public JsonObject requestCurrentFuelPrice(double lat, double lon, int rad, String type, String sort) {
         final Response response = wt.queryParam("lat", lat).queryParam("lng", lon).queryParam("rad", rad).queryParam("sort", sort).queryParam("type", type).request().get();
-        System.out.println(response.toString());
+        // System.out.println(response.toString());
         final JsonObject jsonObject = Json.createReader(response.readEntity(InputStream.class)).readObject();
         //System.out.println(jsonObject.toString());
-        final JsonArray mainData = jsonObject.getJsonArray("stations");
-        final List<JsonObject> stations = getStations(mainData);
-        getDetails(stations);
-        return mainData;
+     //   final JsonArray mainData = jsonObject.getJsonArray("stations");
+     //   final List<JsonObject> stations = getStations(mainData);
+        // getDetails(stations);
+        return jsonObject;
     }
 
     private StationData jsonResponseToFuelPrice(final JsonObject jsonObject) {

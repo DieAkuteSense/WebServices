@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Price Service</title>
+    <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script type="" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css" />
+    <script type="" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script type="" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script type="" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+
+    <!-- Angular Material Library -->
+    <script type="" src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <script type="text/javascript">
+        var names;
+        function getPriceCurrentLocation() {
+            $.post("services/rest/requestPriceCurrentLocation", function(data) {
+                names = data;
+                $('.response-first').append($.parseJSON(data).stations[0].name);
+                angular
+                        .module('selectStation', ['ngMaterial'])
+                        .controller('selectStationContr', function($scope) {
+                            $scope.stations = names;
+                        });
+            });
+        }
+
+
+    </script>
+</h:head>
+<h:body>
+    <h1>XHTML / JSF</h1>
+    <br />
+
+    <h:form onclick="getPriceCurrentLocation()">
+        <input type="button" value="Normaler Post-Aufruf mit HTML für requestPriceCurrentLocation" />
+    </h:form>
+
+
+
+    <hr />
+
+
+    <h:form id="form">
+        <h:commandButton id="button" value="Post" action="#{mappingBean.currentLocation}" />
+    </h:form>
+    <br />
+    <hr />
+    <br />
+    <h:form action="./services/rest/getPriceInCity" method="POST">
+        <p:remoteCommand name="rc" update="msgs" actionListener="#{mappingBean.currentLocation}" />
+        <h:inputText name="lat" />
+        <h:inputText name="lon" />
+        <p:growl id="msgs" showDetail="true" />
+        <p:commandButton type="button" action="./services/rest/getPriceInCity" value="Execute" icon="ui-icon-check" />
+        <p:button href="/services/rest/getPriceInCity" value="Start" />
+    </h:form>
+    <form action="services/rest/getLocation" method="POST">
+        <input type="submit" />
+    </form>
+    <form action="services/rest/requestPriceCurrentLocation" method="POST">
+        <input type="submit" value="Normaler Post-Aufruf mit HTML für requestPriceCurrentLocation" />
+    </form>
+</h:body>
+</html>
