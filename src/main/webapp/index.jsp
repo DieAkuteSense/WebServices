@@ -58,6 +58,10 @@
                                         .ok('Schließen')
                         );
                     };
+
+                    $scope.alertSlider = function() {
+                        alert($scope.geoLocated.rad);
+                    }
                 });
     </script>
 </head>
@@ -73,8 +77,8 @@
             <md-tab-body>
                 <div class="form-in-tab">
                     <form name="userLocatedForm" action="services/rest/getPriceInCity" method="POST">
-                        <div layout="gt-sm-row">
-                            <md-input-container class="md-block">
+                        <div layout="row" class="md-padding">
+                            <md-input-container class="md-padding">
                                 <label>L&auml;ngengrad / Latitude</label>
                                 <input required type="text" name="lat" ng-model="userLocated.lat" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
@@ -83,10 +87,7 @@
                                     </div>
                                 </div>
                             </md-input-container>
-                            <div flex="5" hide-xs hide-sm>
-                                <!-- Spacer //-->
-                            </div>
-                            <md-input-container class="md-block">
+                            <md-input-container class="md-padding">
                                 <label>Breitengrad / Longitude</label>
                                 <input required type="text" name="lon" ng-model="userLocated.lon" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
@@ -96,8 +97,8 @@
                                 </div>
                             </md-input-container>
                         </div>
-                        <div layout="gt-sm-row">
-                            <md-input-container class="md-block">
+                        <div layout="row" class="md-padding">
+                            <md-input-container class="md-padding">
                                 <label>Umkreis / Perimeter</label>
                                 <input required type="number" name="rad" ng-model="userLocated.rad" minlength="1" maxlength="2" min="0" max="25" />
                                 <div ng-messages="userLocated.userLocated.$error" role="alert" md-auto-hide="true">
@@ -109,14 +110,11 @@
                             <div flex="5" hide-xs hide-sm>
                                 <!-- Spacer //-->
                             </div>
-                            <md-input-container class="md-block">
+                            <md-input-container flex class="md-padding">
                                 <label>Kraftstoffart / Sort of fuel</label>
-                                <input required type="text" name="sort" ng-model="userLocated.sort" minlength="1" maxlength="6" ng-pattern="/e10|e5|diesel|all/" />
-                                <div ng-messages="userLocatedForm.userLocated.$error" role="alert" md-auto-hide="true">
-                                    <div ng-message="['required', 'pattern']">
-                                        Please insert e10, e5, diesel, all.
-                                    </div>
-                                </div>
+                                <md-select ng-model="userLocated.sort">
+                                    <md-option ng-repeat="sort in sorts" value="{{sort.name}}">{{sort.desc}}</md-option>
+                                </md-select>
                             </md-input-container>
                         </div>
                         <md-button class="md-primary md-raised" type="submit">Send request</md-button>
@@ -134,6 +132,7 @@
             </md-tab-body>
         </md-tab>
 
+        <!-- TODO: POST request with Java Script, get form values by ng-model (see example md-slider, ng-model="geoLocated.rad" and function alertSlider() -->
         <!-- Tab for geo located request -->
         <md-tab id="geoLocated">
             <md-tab-label>Geo Located</md-tab-label>
@@ -142,9 +141,9 @@
                     <div>
                         <form name="geoLocatedForm" action="services/rest/requestPriceCurrentLocation" method="POST">
                             <div layout="row" class="md-padding">
-                                <span style="color: #e2001a">// Slider gibt kein value Attribut --> request hat keinen Wert für den Radius --> Error</span>
+                                <span flex style="color: #e2001a">// Slider gibt kein value Attribut --> request hat keinen Wert für den Radius --> Error</span>
                                 <md-slider-container flex class="md-padding" style="margin-top: 25px">
-                                    <md-slider flex md-discrete class="md-primary" ng-model="geoLocated.rad" name="rad" value="{{geoLocated.rad}}" step="1" min="0" max="25"></md-slider>
+                                    <md-slider flex md-discrete class="md-primary" ng-model="geoLocated.rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
                                 </md-slider-container>
                                 <md-input-container flex class="md-padding">
                                     <label>Kraftstoffart / Sort of fuel</label>
@@ -153,7 +152,7 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <md-button class="md-primary md-raised" type="submit">Send request</md-button>
+                            <md-button class="md-primary md-raised" ng-click="alertSlider()" type="submit">Send request</md-button>
                         </form>
                     </div>
                 </div>
