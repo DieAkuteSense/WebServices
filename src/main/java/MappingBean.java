@@ -14,7 +14,7 @@ public class MappingBean {
 
     public void currentLocation() {
         FuelPriceService fuelPriceService = new FuelPriceService();
-        fuelPriceService.requestPriceCurrentLocation(FuelPriceClient.RADIUS);
+        fuelPriceService.requestPriceCurrentLocation(FuelPriceClient.RADIUS, FuelPriceClient.TYPE);
 
     }
 }

@@ -7,3 +7,9 @@
     width: 30%;
     float:left
 }
+
+/* coloring tab selection bar */
+.md-tabs.md-default-theme.md-accent > md-tabs-wrapper, md-tabs.md-accent > md-tabs-wrapper {
+    background-color: #5fc9e2;
+
+}

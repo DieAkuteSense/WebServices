@@ -37,11 +37,11 @@ public class GeoLocation {
     @Path("/getLocation")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public List<Double> requestLocation() {
+    public Double[] requestLocation() {
         HttpClient httpClient = HttpClientBuilder.create().build();
         ResponseData result = new ResponseData();
         HttpResponse response;
-        List<Double> doubles = new ArrayList<>();
+        Double[] coordinates = new Double[2];
         StringBuilder sb = new StringBuilder();
         try {
             // Creating HTTP Post Request to Google Geolocation API //
@@ -59,8 +59,8 @@ public class GeoLocation {
             // System.out.println("Latitude: " + lat);
             // System.out.println("Longitude: " + lon);
 
-            doubles.add(lat);
-            doubles.add(lon);
+            coordinates[0] = lat;
+            coordinates[1] = lon;
 
             // System.out.println(response.toString());
             sb.append(">>> Request <<<\n");
@@ -70,7 +70,7 @@ public class GeoLocation {
         } catch (Exception e) {
             System.err.println(e);
         }
-        return doubles;
+        return coordinates;
     }
 
     private void parseInput(String input) {
