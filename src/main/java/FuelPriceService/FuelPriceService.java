@@ -2,8 +2,6 @@ package fuelPriceService;
 
 import geolocation.GeoLocation;
 
-import javax.annotation.ManagedBean;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.jws.WebService;
 import javax.ws.rs.*;
@@ -17,10 +15,12 @@ public class FuelPriceService {
     @Path("/getPriceInCity")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String getPriceInCity(@FormParam("lat") double lat, @FormParam("lon") double lon) {
+    public String getPriceInCity(@FormParam("lat") double lat, @FormParam("lon") double lon, @FormParam("rad") int rad) {
+        System.out.println("lat :" + lat + "\nlon: " + lon);
         FuelPriceClient fpc = new FuelPriceClient();
-        JsonObject jsonArray = fpc.requestCurrentFuelPrice(lat, lon, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
-        return jsonArray.toString();
+        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+        System.out.println(">>> OUTPUT <<<\n" + jsonObject);
+        return jsonObject.toString();
     }
 
     public static void main(String[] argv) {
@@ -32,13 +32,14 @@ public class FuelPriceService {
     @Path("/requestPriceCurrentLocation")
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String requestPriceCurrentLocation() {
+    public String requestPriceCurrentLocation(@FormParam("rad") int rad) {
         GeoLocation geoLocation = new GeoLocation();
         List<Double> coordinates = geoLocation.requestLocation();
         FuelPriceClient fpc = new FuelPriceClient();
         double lat = coordinates.get(0);
         double lon = coordinates.get(1);
-        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.SORT);
+        System.out.println("lat :" + lat + "\nlon: " + lon);
+        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, FuelPriceClient.TYPE, FuelPriceClient.SORT);
         System.out.println(">>> OUTPUT <<<\n" + jsonObject);
         return jsonObject.toString();
     }
