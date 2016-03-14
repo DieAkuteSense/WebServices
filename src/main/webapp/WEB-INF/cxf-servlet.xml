@@ -10,11 +10,6 @@
             http://cxf.apache.org/jaxws
             http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <jaxws:endpoint id="PriceServiceImpl"
-                    implementor="fuelPriceService.FuelPriceServiceImpl"
-                    address="/PriceServiceImpl">
-    </jaxws:endpoint>
-
     <jaxws:endpoint id="PriceService"
                     implementor="fuelPriceService.FuelPriceService"
                     address="/PriceService">
@@ -24,9 +19,11 @@
         <jaxrs:serviceBeans>
             <ref bean="jaxrsBean" />
             <ref bean="jaxrsGeoLocation" />
+            <ref bean="setConfig" />
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
     <bean id="jaxrsBean" class="fuelPriceService.FuelPriceService" />
     <bean id="jaxrsGeoLocation" class="geolocation.GeoLocation" />
+    <bean id="setConfig" class="resources.Config" />
 </beans>

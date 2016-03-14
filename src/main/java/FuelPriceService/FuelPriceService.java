@@ -7,7 +7,6 @@ import javax.jws.WebService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.xml.ws.Endpoint;
-import java.util.List;
 
 @WebService
 public class FuelPriceService implements IFuelPriceService {
@@ -27,8 +26,8 @@ public class FuelPriceService implements IFuelPriceService {
     @Produces(MediaType.TEXT_PLAIN)
     public String getPriceInCity(@FormParam("lat") double lat, @FormParam("lon") double lon, @FormParam("rad") int rad, @FormParam("type") String type) {
         System.out.println("lat :" + lat + "\nlon: " + lon);
-        FuelPriceClient fpc = new FuelPriceClient();
-        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceClient.SORT);
+        FuelPriceBackend fpc = new FuelPriceBackend();
+        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceBackend.SORT);
         System.out.println(">>> OUTPUT <<<\n" + jsonObject);
         return jsonObject.toString();
     }
@@ -52,11 +51,11 @@ public class FuelPriceService implements IFuelPriceService {
     public String requestPriceCurrentLocation(@FormParam("rad") int rad, @FormParam("type") String type) {
         GeoLocation geoLocation = new GeoLocation();
         Double[] coordinates = geoLocation.requestLocation();
-        FuelPriceClient fpc = new FuelPriceClient();
+        FuelPriceBackend fpc = new FuelPriceBackend();
         double lat = coordinates[0];
         double lon = coordinates[1];
         System.out.printf("Ascertained location:%nLatitude: %f%nLongitude: %f%n", lat, lon);
-        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceClient.SORT);
+        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceBackend.SORT);
         System.out.println(">>> OUTPUT <<<\n" + jsonObject);
         return jsonObject.toString();
     }

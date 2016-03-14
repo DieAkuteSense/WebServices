@@ -21,7 +21,7 @@
 
         angular
                 .module('selectStation', ['ngMaterial'])
-                .controller('selectStationContr', function($scope, $mdDialog) {
+                .controller('selectStationContr', function($scope, $mdDialog, $http) {
                     $scope.sorts = [
                         {name: 'e10', desc: 'Super (E10)'},
                         {name: 'e5', desc: 'Super (E5)'},
@@ -43,6 +43,24 @@
                             names = data;
                             console.log(names);
                         });
+                    };
+
+                    $scope.setConfig = function() {
+                        var data = $.param({
+                            test: "hallo"
+                        });
+                        var config = {
+                            headers : {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                            }
+                        };
+                        $http.post('/priceService/services/rest/setConfig', data, config)
+                                .success(function (data, status, headers, config) {
+                                    alert("Success");
+                                })
+                                .error(function (data, status, header, config) {
+                                    alert("Error");
+                                });
                     };
 
                     $scope.openDialog = function(output) {
@@ -169,11 +187,25 @@
 
 
 <br />
+<hr />
 <br />
+
+<form name="configForm" action="services/rest/setConfig" method="POST">
+    <div layout="row" class="md-padding">
+        <md-input-container flex class="md-padding">
+            <label>Kraftstoffart / Sort of fuel</label>
+            <input type="text" ng-model="testData" />
+            <!--<md-select ng-model="geoLocated.sort">
+                <md-option ng-repeat="sort in sorts" ng-model="test_data" value="{{sort.name}}">{{sort.desc}}</md-option>
+            </md-select>-->
+        </md-input-container>
+    </div>
+    <md-button class="md-primary md-raised" ng-click="setConfig()" type="submit">Set config</md-button>
+</form>
+
 <br />
-
-
-
+<hr />
+<br />
 
 <div style="background-color: #eff0f1; padding: 20px">
     <b>Geo Located request. Result loaded in drop down list. Request is invoked when drop down list is opened.</b>

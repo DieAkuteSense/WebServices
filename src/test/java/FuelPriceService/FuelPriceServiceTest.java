@@ -9,8 +9,8 @@ public class FuelPriceServiceTest {
 
     @Test
     public void testGetPriceInCity() {
-    //    FuelPriceClient fpc = new FuelPriceClient();
-    //    StationData testData = fpc.requestCurrentFuelPrice(FuelPriceClient.CITY_LAT, FuelPriceClient.CITY_LON, FuelPriceClient.RADIUS, FuelPriceClient.TYPE, FuelPriceClient.TANKERKOENIG_API_KEY, FuelPriceClient.SORT);
+    //    FuelPriceBackend fpc = new FuelPriceBackend();
+    //    StationData testData = fpc.requestCurrentFuelPrice(FuelPriceBackend.CITY_LAT, FuelPriceBackend.CITY_LON, FuelPriceBackend.RADIUS, FuelPriceBackend.TYPE, FuelPriceBackend.TANKERKOENIG_API_KEY, FuelPriceBackend.SORT);
 
     //     assertNotNull(testData);
     }

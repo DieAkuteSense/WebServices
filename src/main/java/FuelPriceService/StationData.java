@@ -1,8 +1,7 @@
 package fuelPriceService;
 
-/**
- * Created by Olli on 09.03.2016.
- */
+import route.IRouteService;
+
 public class StationData {
     private String name;
     private double lat;
@@ -16,8 +15,12 @@ public class StationData {
     private int postCode;
     private String place;
     private boolean isOpen;
+    private double userLocationLat;
+    private double userLocationLon;
+    private double cruiseDist;
+    private double cruiseDuration;
 
-    public StationData(String name, double lat, double lon, String brand, double dist, double price, String id, String street, String houseNumber, int postCode, String place, boolean isOpen) {
+    public StationData(String name, double lat, double lon, String brand, double dist, double price, String id, String street, String houseNumber, int postCode, String place, boolean isOpen, double userLocationLat, double userLocationLon) {
         this.name = name;
         this.lat = lat;
         this.lon = lon;
@@ -30,6 +33,14 @@ public class StationData {
         this.postCode = postCode;
         this.place = place;
         this.isOpen = isOpen;
+        // TODO get the data from calcDistTime, return value is a double array [dist, duration]. Parameters to call are: startLat, startLon, endLat, endLon
+        /*
+            Double[] distAndTime = IRouteService.calcDistTime(1.0, 1.0, lat, lon); // startLat: user´s current lat, startLon: user´s current lon, endLat: gas stations lat, endLon: gas stations lon
+            this.cruiseDist = distAndTime[0];
+            this.cruiseDuration = distAndTime[1];
+         */
+        this.userLocationLat = userLocationLat;
+        this.userLocationLon = userLocationLon;
     }
 
     public StationData() {
@@ -130,6 +141,38 @@ public class StationData {
 
     public void setOpen(boolean open) {
         isOpen = open;
+    }
+
+    public double getCruiseDist() {
+        return cruiseDist;
+    }
+
+    public void setCruiseDist(double cruiseDist) {
+        this.cruiseDist = cruiseDist;
+    }
+
+    public double getCruiseDuration() {
+        return cruiseDuration;
+    }
+
+    public void setCruiseDuration(double cruiseDuration) {
+        this.cruiseDuration = cruiseDuration;
+    }
+
+    public double getUserLocationLon() {
+        return userLocationLon;
+    }
+
+    public void setUserLocationLon(double userLocationLon) {
+        this.userLocationLon = userLocationLon;
+    }
+
+    public double getUserLocationLat() {
+        return userLocationLat;
+    }
+
+    public void setUserLocationLat(double userLocationLat) {
+        this.userLocationLat = userLocationLat;
     }
 
     @Override
