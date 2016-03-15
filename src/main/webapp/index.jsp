@@ -22,7 +22,7 @@
         angular
                 .module('selectStation', ['ngMaterial'])
                 .controller('selectStationContr', function($scope, $mdDialog, $http) {
-                    $scope.sorts = [
+                    $scope.types = [
                         {name: 'e10', desc: 'Super (E10)'},
                         {name: 'e5', desc: 'Super (E5)'},
                         {name: 'diesel', desc: 'Diesel'},
@@ -31,54 +31,50 @@
 
                     $scope.labels = null;
                     $scope.label = null;
+
                     $scope.ngInit = function() {
-                       return $.post("services/rest/requestPriceCurrentLocation", function(data) {
+                        var client = new XMLHttpRequest();
+                        client.open('POST', '/priceService/services/rest/geoLocatedPrice');
+                        client.setRequestHeader('rad', '25');
+                        client.setRequestHeader('type', 'all');
+                        client.setRequestHeader('sort', 'dist');
+                        client.send();
+
+                        // TODO Dropdown-Liste bleibt leer
+                        var data = JSON.stringify(client.responseText);
+                        return $scope.labels = $.parseJSON(data).stations;
+
+                       /*return $.post("services/rest/requestPriceCurrentLocation", function(data) {
                             $scope.labels = $.parseJSON(data).stations;
-                        });
+                        });*/
                     };
 
-                    $scope.getPriceCurrentLocation = function() {
-                        $scope.msg = 'hallo';
-                        $.post("services/rest/requestPriceCurrentLocation", function(data) {
-                            names = data;
-                            console.log(names);
-                        });
+                    $scope.geoLocatedPrice = function() {
+                        var priceClient = new XMLHttpRequest();
+                        priceClient.open('POST', '/priceService/services/rest/geoLocatedPrice');
+                        priceClient.setRequestHeader('rad', $scope.geoLocated_rad);
+                        priceClient.setRequestHeader('type', $scope.geoLocated_type);
+                        priceClient.setRequestHeader('sort', 'dist');
+                        priceClient.send();
                     };
 
-                    $scope.setConfig = function() {
-                        var data = $.param({
-                            test: "hallo"
-                        });
-                        var config = {
-                            headers : {
-                                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                            }
-                        };
-                        $http.post('/priceService/services/rest/setConfig', data, config)
-                                .success(function (data, status, headers, config) {
-                                    alert("Success");
-                                })
-                                .error(function (data, status, header, config) {
-                                    alert("Error");
-                                });
+                    $scope.userLocatedPrice = function() {
+                        var priceClient = new XMLHttpRequest();
+                        priceClient.open('POST', '/priceService/services/rest/userLocatedPrice');
+                        priceClient.setRequestHeader('lat', $scope.userLocated_lat);
+                        priceClient.setRequestHeader('lon', $scope.userLocated_lon);
+                        priceClient.setRequestHeader('rad', $scope.userLocated_rad);
+                        priceClient.setRequestHeader('type', $scope.userLocated_type);
+                        priceClient.setRequestHeader('sort', 'dist');
+                        priceClient.send();
                     };
 
-                    $scope.openDialog = function(output) {
-                        $scope.output = null;
-                        $.post("services/rest/requestPriceCurrentLocation", function(data) {
-                            $scope.output = data;
-                        });
-                        $mdDialog.show(
-                                $mdDialog.alert()
-                                        .clickOutsideToClose(true)
-                                        .title('Billigste Tankstelle')
-                                        .textContent($.parseJSON(output).stations[0].name)
-                                        .ok('Schließen')
-                        );
-                    };
-
-                    $scope.alertSlider = function() {
-                        alert($scope.geoLocated.rad);
+                    $scope.setGlobalConfig = function(userLocationLat, userLocationLon) {
+                        var configClient = new XMLHttpRequest();
+                        configClient.open('POST', '/priceService/services/rest/setGlobalConfig');
+                        configClient.setRequestHeader('userLocationLat', userLocationLat);
+                        configClient.setRequestHeader('userLocationLon', userLocationLon);
+                        configClient.send();
                     }
                 });
     </script>
@@ -94,20 +90,20 @@
             <md-tab-label>User Located</md-tab-label>
             <md-tab-body>
                 <div class="form-in-tab">
-                    <form name="userLocatedForm" action="services/rest/getPriceInCity" method="POST">
+                    <form name="userLocatedForm">
                         <div layout="row" class="md-padding">
-                            <md-input-container class="md-padding">
+                            <md-input-container flex>
                                 <label>L&auml;ngengrad / Latitude</label>
-                                <input required type="text" name="lat" ng-model="userLocated.lat" minlength="1" maxlength="12" />
+                                <input required type="text" name="lat" ng-model="userLocated_lat" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
                                     <div ng-message-exp="['required', 'minlength', 'maxlength']">
                                         Der L&auml;ngengrad muss eine Zahl sein! / The latitude has to be a number!
                                     </div>
                                 </div>
                             </md-input-container>
-                            <md-input-container class="md-padding">
+                            <md-input-container flex>
                                 <label>Breitengrad / Longitude</label>
-                                <input required type="text" name="lon" ng-model="userLocated.lon" minlength="1" maxlength="12" />
+                                <input required type="text" name="lon" ng-model="userLocated_lon" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
                                     <div ng-message-exp="['required', 'minlength', 'maxlength']">
                                         Der Breitengrad muss eine Zahl sein! / The longitude has to be a number!
@@ -116,26 +112,17 @@
                             </md-input-container>
                         </div>
                         <div layout="row" class="md-padding">
-                            <md-input-container class="md-padding">
-                                <label>Umkreis / Perimeter</label>
-                                <input required type="number" name="rad" ng-model="userLocated.rad" minlength="1" maxlength="2" min="0" max="25" />
-                                <div ng-messages="userLocated.userLocated.$error" role="alert" md-auto-hide="true">
-                                    <div ng-message="['max', 'min', 'required']">
-                                        Please insert a value between 0 and 25.
-                                    </div>
-                                </div>
-                            </md-input-container>
-                            <div flex="5" hide-xs hide-sm>
-                                <!-- Spacer //-->
-                            </div>
-                            <md-input-container flex class="md-padding">
+                            <md-slider-container flex style="margin-top: 25px">
+                                <md-slider flex md-discrete class="md-primary" ng-model="userLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
+                            </md-slider-container>
+                            <md-input-container flex>
                                 <label>Kraftstoffart / Sort of fuel</label>
-                                <md-select ng-model="userLocated.sort">
-                                    <md-option ng-repeat="sort in sorts" value="{{sort.name}}">{{sort.desc}}</md-option>
+                                <md-select ng-model="userLocated_type">
+                                    <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
                                 </md-select>
                             </md-input-container>
                         </div>
-                        <md-button class="md-primary md-raised" type="submit">Send request</md-button>
+                        <md-button class="md-primary md-raised" ng-click="userLocatedPrice()" type="submit">Send request</md-button>
                     </form>
                 </div>
                 <div class="description-in-tab">
@@ -150,27 +137,25 @@
             </md-tab-body>
         </md-tab>
 
-        <!-- TODO: POST request with Java Script, get form values by ng-model (see example md-slider, ng-model="geoLocated.rad" and function alertSlider() -->
         <!-- Tab for geo located request -->
         <md-tab id="geoLocated">
             <md-tab-label>Geo Located</md-tab-label>
             <md-tab-body>
                 <div class="form-in-tab">
                     <div>
-                        <form name="geoLocatedForm" action="services/rest/requestPriceCurrentLocation" method="POST">
+                        <form name="geoLocatedForm">
                             <div layout="row" class="md-padding">
-                                <span flex style="color: #e2001a">// Slider gibt kein value Attribut --> request hat keinen Wert für den Radius --> Error</span>
                                 <md-slider-container flex class="md-padding" style="margin-top: 25px">
-                                    <md-slider flex md-discrete class="md-primary" ng-model="geoLocated.rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
+                                    <md-slider flex md-discrete class="md-primary" ng-model="geoLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
                                 </md-slider-container>
                                 <md-input-container flex class="md-padding">
                                     <label>Kraftstoffart / Sort of fuel</label>
-                                    <md-select ng-model="geoLocated.sort">
-                                        <md-option ng-repeat="sort in sorts" value="{{sort.name}}">{{sort.desc}}</md-option>
+                                    <md-select ng-model="geoLocated_type">
+                                        <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <md-button class="md-primary md-raised" ng-click="alertSlider()" type="submit">Send request</md-button>
+                            <md-button class="md-primary md-raised" ng-click="geoLocatedPrice()" type="submit">Send request</md-button>
                         </form>
                     </div>
                 </div>
@@ -184,25 +169,6 @@
     </md-tabs>
 </md-content>
 
-
-
-<br />
-<hr />
-<br />
-
-<form name="configForm" action="services/rest/setConfig" method="POST">
-    <div layout="row" class="md-padding">
-        <md-input-container flex class="md-padding">
-            <label>Kraftstoffart / Sort of fuel</label>
-            <input type="text" ng-model="testData" />
-            <!--<md-select ng-model="geoLocated.sort">
-                <md-option ng-repeat="sort in sorts" ng-model="test_data" value="{{sort.name}}">{{sort.desc}}</md-option>
-            </md-select>-->
-        </md-input-container>
-    </div>
-    <md-button class="md-primary md-raised" ng-click="setConfig()" type="submit">Set config</md-button>
-</form>
-
 <br />
 <hr />
 <br />
@@ -213,12 +179,7 @@
         <md-option ng-value="label.name" ng-repeat="label in labels">Tankstelle: {{label.name}} // Preis: {{label.price}}</md-option>
     </md-select>
 </div>
-<form onclick="getPriceCurrentLocation()">
-    <md-button class="md-primary md-raised">Send request</md-button>
-</form>
-<form>
-    <md-button class="md-primary md-raised" onclick="openDialog()">Billigste Tankstelle (Dialog - funktioniert aber nicht)</md-button>
-</form>
+
 
 </body>
 </html>

@@ -17,13 +17,11 @@
 
     <jaxrs:server id="jaxrstest" address="/rest">
         <jaxrs:serviceBeans>
-            <ref bean="jaxrsBean" />
-            <ref bean="jaxrsGeoLocation" />
-            <ref bean="setConfig" />
+            <ref bean="beanPriceService" />
+            <ref bean="beanGeo" />
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="jaxrsBean" class="fuelPriceService.FuelPriceService" />
-    <bean id="jaxrsGeoLocation" class="geolocation.GeoLocation" />
-    <bean id="setConfig" class="resources.Config" />
+    <bean id="beanPriceService" class="fuelPriceService.FuelPriceService" />
+    <bean id="beanGeo" class="geolocation.GeoLocation" />
 </beans>

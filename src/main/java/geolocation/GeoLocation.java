@@ -34,9 +34,8 @@ public class GeoLocation {
     public GeoLocation() {
     }
 
-    @Path("/getLocation")
+    @Path("/geoLocation")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
     public Double[] requestLocation() {
         HttpClient httpClient = HttpClientBuilder.create().build();
         ResponseData result = new ResponseData();
@@ -45,15 +44,14 @@ public class GeoLocation {
         StringBuilder sb = new StringBuilder();
         try {
             // Creating HTTP Post Request to Google Geolocation API //
-            HttpPost request = new HttpPost("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDEhCTh03VykiRtsic2ii6GMmFL6Q6ezvY");
+            HttpPost request = new HttpPost(GEOLOCATION_API_URL + "?key=" + GEOLOCATION_API_KEY);
             StringEntity params = new StringEntity("{\"considerIp\": \"true\"}");
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
-            // System.out.println(request.toString());
+
             // Get response from Google Geolocation API and parse it to Json Object
             response = httpClient.execute(request);
             String temp = EntityUtils.toString(response.getEntity());
-            // System.out.println(temp);
 
             parseInput(temp);
             // System.out.println("Latitude: " + lat);

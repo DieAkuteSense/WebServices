@@ -1,5 +1,8 @@
 package fuelPriceService;
 
+import resources.Config;
+import resources.ConfigData;
+
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -26,11 +29,6 @@ public class FuelPriceBackend implements IFuelPriceBackend{
     public static final String TYPE = "diesel";
     public static final String SORT = "price";
     private final WebTarget wt;
-    private double lat;
-    private double lon;
-    private int rad;
-    private String type;
-    private String sort;
 
     /**
      * Configuration end
@@ -53,36 +51,44 @@ public class FuelPriceBackend implements IFuelPriceBackend{
                 .request()
                 .get();
         final JsonObject jsonObject = Json.createReader(response.readEntity(InputStream.class)).readObject();
+        getStations(jsonObject.getJsonArray("stations"));
         return jsonObject;
     }
 
     private StationData createStationDataObjects(final JsonObject jsonObject) {
-        final String name = jsonObject.getString("name");
-        final double lat = jsonObject.getJsonNumber("lat").doubleValue();
-        final double lon = jsonObject.getJsonNumber("lng").doubleValue();
-        final String brand = jsonObject.getString("brand");
-        final double dist = jsonObject.getJsonNumber("dist").doubleValue();
-        final double price = jsonObject.getJsonNumber("price").doubleValue();
-        final String id = jsonObject.getString("id");
-        final String street = jsonObject.getString("street");
-        final String houseNumber = jsonObject.getString("houseNumber");
-        final int postCode = jsonObject.getJsonNumber("postCode").intValue();
-        final String place = jsonObject.getString("place");
-        final boolean isOpen = jsonObject.getBoolean("isOpen");
 
-        /*
-            StringBuilder sb = new StringBuilder()
+        try {
+            final String name = jsonObject.getString("name");
+            final double lat = jsonObject.getJsonNumber("lat").doubleValue();
+            final double lon = jsonObject.getJsonNumber("lng").doubleValue();
+            final String brand = jsonObject.getString("brand");
+            final double dist = jsonObject.getJsonNumber("dist").doubleValue();
+            final double price = jsonObject.getJsonNumber("price").doubleValue();
+            final String id = jsonObject.getString("id");
+            final String street = jsonObject.getString("street");
+            final String houseNumber = jsonObject.getString("houseNumber");
+            final int postCode = jsonObject.getJsonNumber("postCode").intValue();
+            final String place = jsonObject.getString("place");
+            final boolean isOpen = jsonObject.getBoolean("isOpen");
+            final double userLat = Config.configData.getUserLat();
+            final double userLon = Config.configData.getUserLon();
+
+            StringBuilder sb = new StringBuilder();
             sb.append("-----------------------------------------------------------");
             sb.append("\nSelected station:");
             sb.append("\nName: " + name);
             sb.append("\nPrice: " + price);
             sb.append("\nStation ID: " + id);
+            sb.append("\nUser Latitude: " + userLat);
+            sb.append("\nUser Longitude: " + userLon);
             sb.append("\n-----------------------------------------------------------");
             System.out.println(sb.toString());
-        */
 
-        // return new StationData(name, lat, lon, brand, dist, price, id, street, houseNumber, postCode, place, isOpen);
-        return null;
+            return new StationData(name, lat, lon, brand, dist, price, id, street, houseNumber, postCode, place, isOpen, userLat, userLon);
+        } catch(Exception e) {
+            System.err.println("Please check if a value is NULL:\n" + jsonObject.toString() + "\n");
+        }
+        return new StationData("request failed", 1.0, 1.0, "abc", 1.0, 1.0, "abc", "abc", "abc", 123, "abc", true, 1.0, 1.0);
     }
 
     private List<JsonObject> getStations(JsonArray jsonArray) {
@@ -91,6 +97,7 @@ public class FuelPriceBackend implements IFuelPriceBackend{
             names.add(jsonArray.getJsonObject(i));
         }
         // System.out.println("Found stations: " + names.toString());
+        getDetails(names);
         return names;
     }
 
