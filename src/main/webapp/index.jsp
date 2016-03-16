@@ -40,7 +40,7 @@
                         client.setRequestHeader('sort', 'dist');
                         client.send();
 
-                        // TODO Dropdown-Liste bleibt leer
+                        // FIXME Dropdown-Liste bleibt leer
                         var data = JSON.stringify(client.responseText);
                         return $scope.labels = $.parseJSON(data).stations;
 

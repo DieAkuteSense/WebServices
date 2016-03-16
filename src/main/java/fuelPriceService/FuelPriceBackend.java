@@ -88,9 +88,11 @@ public class FuelPriceBackend implements IFuelPriceBackend{
         } catch(Exception e) {
             System.err.println("Please check if a value is NULL:\n" + jsonObject.toString() + "\n");
         }
+        // TODO exception handling (if a value is NULL) not very nice
         return new StationData("request failed", 1.0, 1.0, "abc", 1.0, 1.0, "abc", "abc", "abc", 123, "abc", true, 1.0, 1.0);
     }
 
+    // TODO call when user selects a gas station (maybe as POST RESTful Service --> then implement a mapping-method in FuelPriceService)
     private List<JsonObject> getStations(JsonArray jsonArray) {
         List<JsonObject> names = new ArrayList<>();
         for(int i = 0; i < jsonArray.size(); i++) {
@@ -101,7 +103,7 @@ public class FuelPriceBackend implements IFuelPriceBackend{
         return names;
     }
 
-    // TODO just selects the 1 value of the object-list, has to select the user-selected value
+    // FIXME just selects the 1 value of the object-list, has to select the user-selected value
     private StationData getDetails(List<JsonObject> data) {
         JsonObject detailedInformation;
         detailedInformation = data.get(0);

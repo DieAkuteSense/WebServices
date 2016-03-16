@@ -1,6 +1,8 @@
 package fuelPriceService;
 
 import geolocation.GeoLocation;
+import resources.Config;
+import resources.ConfigData;
 
 import javax.json.JsonObject;
 import javax.jws.WebService;
@@ -11,24 +13,58 @@ import javax.xml.ws.Endpoint;
 @WebService
 public class FuelPriceService implements IFuelPriceService {
 
+    @Override @POST
+    @Path("/userLocatedPrice") @Produces(MediaType.TEXT_PLAIN)
+    public String userLocatedPrice(@HeaderParam("lat") double lat, @HeaderParam("lon") double lon, @HeaderParam("rad") int rad, @HeaderParam("type") String type, @HeaderParam("sort") String sort) {
+        Config config = new Config();
+        FuelPriceBackend fpb = new FuelPriceBackend();
 
-    /**
-     * Called with RESTful Service under URI /priceService/services/rest/getPriceInCity
-     * @param lat (double) user input latitude; necessary to request data for the user-specified location
-     * @param lon (double) user input longitude; necessary to request data for the user-specified location
-     * @param rad (int) user input radius; necessary to request data in the perimeter of the user-specified location
-     * @param type (String) user input type; necessary to request data for the user-specified fuel type
-     * @return received data
-     */
-    @Override
-    @Path("/getPriceInCity")
-    @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getPriceInCity(@FormParam("lat") double lat, @FormParam("lon") double lon, @FormParam("rad") int rad, @FormParam("type") String type) {
-        System.out.println("lat :" + lat + "\nlon: " + lon);
-        FuelPriceBackend fpc = new FuelPriceBackend();
-        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceBackend.SORT);
+        if(type.equals("all")) {
+            sort = "dist";
+        }
+
+        config.setConfig(lat, lon);
+
+        JsonObject jsonObject = fpb.requestCurrentFuelPrice(lat, lon, rad, type, sort);
+
+        System.out.println("--------------------------------------------------------------------");
+        System.out.printf("User input:%nRadius: %s%nFuel type: %s%n", rad, type);
+        System.out.println("--------------------------------------------------------------------");
+        System.out.printf("User location:%nLatitude: %f%nLongitude: %f%n", lat, lon);
+        System.out.println("--------------------------------------------------------------------");
         System.out.println(">>> OUTPUT <<<\n" + jsonObject);
+        System.out.println("--------------------------------------------------------------------");
+
+        return jsonObject.toString();
+    }
+
+    @Override @POST
+    @Path("/geoLocatedPrice") @Produces(MediaType.TEXT_PLAIN)
+    public String geoLocatedPrice(@HeaderParam("rad") int rad, @HeaderParam("type") String type, @HeaderParam("sort") String sort) {
+        GeoLocation geoLocation = new GeoLocation();
+        Config config = new Config();
+        FuelPriceBackend fbp = new FuelPriceBackend();
+
+        if(type.equals("all")) {
+            sort = "dist";
+        }
+
+        Double[] coordinates = geoLocation.requestLocation();
+        double lat = coordinates[0];
+        double lon = coordinates[1];
+
+        config.setConfig(lat, lon);
+
+        JsonObject jsonObject = fbp.requestCurrentFuelPrice(lat, lon, rad, type, sort);
+
+        System.out.println("--------------------------------------------------------------------");
+        System.out.printf("User input:%nRadius: %s%nFuel type: %s%n", rad, type);
+        System.out.println("--------------------------------------------------------------------");
+        System.out.printf("Ascertained location:%nLatitude: %f%nLongitude: %f%n", lat, lon);
+        System.out.println("--------------------------------------------------------------------");
+        System.out.println(">>> OUTPUT <<<\n" + jsonObject);
+        System.out.println("--------------------------------------------------------------------");
+
         return jsonObject.toString();
     }
 
@@ -36,27 +72,5 @@ public class FuelPriceService implements IFuelPriceService {
         Object implementor = new FuelPriceService ();
         String address = "http://localhost:9000/fuelPriceService";
         Endpoint.publish(address, implementor);
-    }
-
-    /**
-     * Called with RESTful Service under URI /priceService/services/rest/requestPriceCurrentLocation
-     * @param rad (int) user input radius; necessary to request data in the perimeter of the user-specified location
-     * @param type (String) user input type; necessary to request data for the user-specified fuel type
-     * @return
-     */
-    @Override
-    @Path("/requestPriceCurrentLocation")
-    @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    public String requestPriceCurrentLocation(@FormParam("rad") int rad, @FormParam("type") String type) {
-        GeoLocation geoLocation = new GeoLocation();
-        Double[] coordinates = geoLocation.requestLocation();
-        FuelPriceBackend fpc = new FuelPriceBackend();
-        double lat = coordinates[0];
-        double lon = coordinates[1];
-        System.out.printf("Ascertained location:%nLatitude: %f%nLongitude: %f%n", lat, lon);
-        JsonObject jsonObject = fpc.requestCurrentFuelPrice(lat, lon, rad, type, FuelPriceBackend.SORT);
-        System.out.println(">>> OUTPUT <<<\n" + jsonObject);
-        return jsonObject.toString();
     }
 }
