@@ -20,8 +20,8 @@
         var names;
 
         angular
-                .module('selectStation', ['ngMaterial'])
-                .controller('selectStationContr', function($scope, $mdDialog, $http) {
+                .module('frontend', ['ngMaterial'])
+                .controller('frontendCtrl', function($scope, $mdDialog, $http) {
                     $scope.types = [
                         {name: 'e10', desc: 'Super (E10)'},
                         {name: 'e5', desc: 'Super (E5)'},
@@ -36,17 +36,15 @@
                         var client = new XMLHttpRequest();
                         client.open('POST', '/priceService/services/rest/geoLocatedPrice');
                         client.setRequestHeader('rad', '25');
-                        client.setRequestHeader('type', 'all');
+                        client.setRequestHeader('type', 'diesel');
                         client.setRequestHeader('sort', 'dist');
                         client.send();
-
-                        // FIXME Dropdown-Liste bleibt leer
-                        var data = JSON.stringify(client.responseText);
-                        return $scope.labels = $.parseJSON(data).stations;
-
-                       /*return $.post("services/rest/requestPriceCurrentLocation", function(data) {
-                            $scope.labels = $.parseJSON(data).stations;
-                        });*/
+                        client.onreadystatechange = function() {
+                            if(client.readyState == 4) {
+                                var data = client.responseText;
+                                $scope.labels = $.parseJSON(data).stations;
+                            }
+                        };
                     };
 
                     $scope.geoLocatedPrice = function() {
@@ -59,6 +57,7 @@
                     };
 
                     $scope.userLocatedPrice = function() {
+                        alert($scope.tessst);
                         var priceClient = new XMLHttpRequest();
                         priceClient.open('POST', '/priceService/services/rest/userLocatedPrice');
                         priceClient.setRequestHeader('lat', $scope.userLocated_lat);
@@ -67,6 +66,12 @@
                         priceClient.setRequestHeader('type', $scope.userLocated_type);
                         priceClient.setRequestHeader('sort', 'dist');
                         priceClient.send();
+                        priceClient.onreadystatechange = function() {
+                            if(priceClient.readyState == 4) {
+                                var data = priceClient.responseText;
+                                $scope.stations = $.parseJSON(data).stations;
+                            }
+                        };
                     };
 
                     $scope.setGlobalConfig = function(userLocationLat, userLocationLon) {
@@ -79,7 +84,7 @@
                 });
     </script>
 </head>
-<body ng-app="selectStation" class="md-padding" ng-controller="selectStationContr" ng-cloak>
+<body ng-app="frontend" ng-controller="frontendCtrl" ng-cloak>
 <h1 class="md-headline">Fuel Price Service - Find your gas station</h1>
 <h1 class="md-subhead">Web-Service by Andreas Elsemann, Frederik Salzmann, Oliver Scholz</h1>
 <md-content>
@@ -89,6 +94,56 @@
         <md-tab id="userLocated">
             <md-tab-label>User Located</md-tab-label>
             <md-tab-body>
+                <form name="userLocatedForm">
+                    <!-- FIXME ng-model seems not to work in md-grid-list -->
+                    <md-grid-list md-cols="5" md-gutter="1em" md-row-height="70px">
+                        <md-grid-tile md-rowspan="2" md-colspan="1">
+                            <md-input-container>
+                                <label>L&auml;ngengrad / Latitude</label>
+                                <input required type="text" name="lat" ng-model="userLocated_lat" minlength="1" maxlength="12" />
+                                <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
+                                    <div ng-message-exp="['required', 'minlength', 'maxlength']">
+                                        Der L&auml;ngengrad muss eine Zahl sein! / The latitude has to be a number!
+                                    </div>
+                                </div>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="2" md-colspan="1">
+                            <md-input-container flex>
+                                <label>Breitengrad / Longitude</label>
+                                <input required type="text" name="lon" ng-model="userLocated_lon" minlength="1" maxlength="12" />
+                                <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
+                                    <div ng-message-exp="['required', 'minlength', 'maxlength']">
+                                        Der Breitengrad muss eine Zahl sein! / The longitude has to be a number!
+                                    </div>
+                                </div>
+                            </md-input-container>
+                        </md-grid-tile>
+
+                        <md-grid-tile md-rowspan="3" md-colspan="3">
+                            <md-grid-tile-footer>
+                                <h3>Response</h3>
+                            </md-grid-tile-footer>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
+                            <md-slider-container flex style="margin-top: 25px">
+                                <md-slider flex md-discrete class="md-primary" ng-model="userLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
+                            </md-slider-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
+                            <md-input-container flex>
+                                <label>Kraftstoffart / Sort of fuel</label>
+                                <md-select ng-model="userLocated_type">
+                                    <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="2">
+                            <md-button class="md-primary md-raised" ng-click="userLocatedPrice()" type="submit">Send request</md-button>
+                        </md-grid-tile>
+                    </md-grid-list>
+                </form>
+                <!--
                 <div class="form-in-tab">
                     <form name="userLocatedForm">
                         <div layout="row" class="md-padding">
@@ -134,8 +189,21 @@
                         Longitude: 9.146
                     </p>
                 </div>
+                <md-divider></md-divider>
+                <md-subheader class="md-no-sticky">Ergebnisse</md-subheader>
+                <md-list-item class="secondary-button-padding">
+                    <div ng-repeat="station in stations">
+                        <p>{{station.name}}</p>
+                        <md-button class="md-secondary" ng-click="doSecondaryAction($event)">More Info</md-button>
+                        <br />
+                    </div>
+                </md-list-item>
+                -->
+
             </md-tab-body>
         </md-tab>
+
+
 
         <!-- Tab for geo located request -->
         <md-tab id="geoLocated">
