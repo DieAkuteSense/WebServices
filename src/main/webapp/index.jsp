@@ -29,6 +29,11 @@
                         {name: 'all', desc: 'Alle Kraftstoffe'}
                     ];
 
+                    $scope.sorts = [
+                        {name: 'dist', desc: 'Distanz'},
+                        {name: 'price', desc: 'Preis'}
+                    ]
+
                     $scope.labels = null;
                     $scope.label = null;
 
@@ -48,23 +53,32 @@
                     };
 
                     $scope.geoLocatedPrice = function() {
+
+
+
+                        var data = null;
                         var priceClient = new XMLHttpRequest();
                         priceClient.open('POST', '/priceService/services/rest/geoLocatedPrice');
                         priceClient.setRequestHeader('rad', $scope.geoLocated_rad);
                         priceClient.setRequestHeader('type', $scope.geoLocated_type);
-                        priceClient.setRequestHeader('sort', 'dist');
+                        priceClient.setRequestHeader('sort', $scope.geoLocated_sort);
                         priceClient.send();
+                        priceClient.onreadystatechange = function() {
+                            if(priceClient.readyState == 4) {
+                                data = priceClient.responseText
+                                $scope.stations = $.parseJSON(data).stations;
+                            }
+                        };
                     };
 
                     $scope.userLocatedPrice = function() {
-                        alert($scope.tessst);
                         var priceClient = new XMLHttpRequest();
                         priceClient.open('POST', '/priceService/services/rest/userLocatedPrice');
                         priceClient.setRequestHeader('lat', $scope.userLocated_lat);
                         priceClient.setRequestHeader('lon', $scope.userLocated_lon);
                         priceClient.setRequestHeader('rad', $scope.userLocated_rad);
                         priceClient.setRequestHeader('type', $scope.userLocated_type);
-                        priceClient.setRequestHeader('sort', 'dist');
+                        priceClient.setRequestHeader('sort', $scope.userLocated_sort);
                         priceClient.send();
                         priceClient.onreadystatechange = function() {
                             if(priceClient.readyState == 4) {
@@ -95,12 +109,11 @@
             <md-tab-label>User Located</md-tab-label>
             <md-tab-body>
                 <form name="userLocatedForm">
-                    <!-- FIXME ng-model seems not to work in md-grid-list -->
                     <md-grid-list md-cols="5" md-gutter="1em" md-row-height="70px">
                         <md-grid-tile md-rowspan="2" md-colspan="1">
                             <md-input-container>
                                 <label>L&auml;ngengrad / Latitude</label>
-                                <input required type="text" name="lat" ng-model="userLocated_lat" minlength="1" maxlength="12" />
+                                <input required type="text" name="lat" ng-model="$parent.$parent.userLocated_lat" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
                                     <div ng-message-exp="['required', 'minlength', 'maxlength']">
                                         Der L&auml;ngengrad muss eine Zahl sein! / The latitude has to be a number!
@@ -111,7 +124,7 @@
                         <md-grid-tile md-rowspan="2" md-colspan="1">
                             <md-input-container flex>
                                 <label>Breitengrad / Longitude</label>
-                                <input required type="text" name="lon" ng-model="userLocated_lon" minlength="1" maxlength="12" />
+                                <input required type="text" name="lon" ng-model="$parent.$parent.userLocated_lon" minlength="1" maxlength="12" />
                                 <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
                                     <div ng-message-exp="['required', 'minlength', 'maxlength']">
                                         Der Breitengrad muss eine Zahl sein! / The longitude has to be a number!
@@ -119,7 +132,6 @@
                                 </div>
                             </md-input-container>
                         </md-grid-tile>
-
                         <md-grid-tile md-rowspan="3" md-colspan="3">
                             <md-grid-tile-footer>
                                 <h3>Response</h3>
@@ -127,79 +139,30 @@
                         </md-grid-tile>
                         <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-slider-container flex style="margin-top: 25px">
-                                <md-slider flex md-discrete class="md-primary" ng-model="userLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
+                                <md-slider flex md-discrete class="md-primary" ng-model="$parent.$parent.userLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
                             </md-slider-container>
                         </md-grid-tile>
                         <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-input-container flex>
                                 <label>Kraftstoffart / Sort of fuel</label>
-                                <md-select ng-model="userLocated_type">
+                                <md-select ng-model="$parent.$parent.userLocated_type">
                                     <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
                                 </md-select>
                             </md-input-container>
                         </md-grid-tile>
-                        <md-grid-tile md-rowspan="1" md-colspan="2">
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
+                            <md-input-container flex>
+                                <label>Sortieren nach / Sort by</label>
+                                <md-select ng-model="$parent.$parent.userLocated_sort">
+                                    <md-option ng-repeat="sort in sorts" value="{{sort.name}}">{{sort.desc}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-button class="md-primary md-raised" ng-click="userLocatedPrice()" type="submit">Send request</md-button>
                         </md-grid-tile>
                     </md-grid-list>
                 </form>
-                <!--
-                <div class="form-in-tab">
-                    <form name="userLocatedForm">
-                        <div layout="row" class="md-padding">
-                            <md-input-container flex>
-                                <label>L&auml;ngengrad / Latitude</label>
-                                <input required type="text" name="lat" ng-model="userLocated_lat" minlength="1" maxlength="12" />
-                                <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
-                                    <div ng-message-exp="['required', 'minlength', 'maxlength']">
-                                        Der L&auml;ngengrad muss eine Zahl sein! / The latitude has to be a number!
-                                    </div>
-                                </div>
-                            </md-input-container>
-                            <md-input-container flex>
-                                <label>Breitengrad / Longitude</label>
-                                <input required type="text" name="lon" ng-model="userLocated_lon" minlength="1" maxlength="12" />
-                                <div ng-messages="userLocatedForm.userLocated.$error" role="alert">
-                                    <div ng-message-exp="['required', 'minlength', 'maxlength']">
-                                        Der Breitengrad muss eine Zahl sein! / The longitude has to be a number!
-                                    </div>
-                                </div>
-                            </md-input-container>
-                        </div>
-                        <div layout="row" class="md-padding">
-                            <md-slider-container flex style="margin-top: 25px">
-                                <md-slider flex md-discrete class="md-primary" ng-model="userLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
-                            </md-slider-container>
-                            <md-input-container flex>
-                                <label>Kraftstoffart / Sort of fuel</label>
-                                <md-select ng-model="userLocated_type">
-                                    <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                        <md-button class="md-primary md-raised" ng-click="userLocatedPrice()" type="submit">Send request</md-button>
-                    </form>
-                </div>
-                <div class="description-in-tab">
-                    <p>Description</p>
-                    <p>
-                        Enter (valid) coordinates in the input fields. The coordinates have to be located in Germany.
-                        Example: Mosbach, Baden-W&uuml;rttemberg has the coordinates<br />
-                        Latitude: 49.352<br />
-                        Longitude: 9.146
-                    </p>
-                </div>
-                <md-divider></md-divider>
-                <md-subheader class="md-no-sticky">Ergebnisse</md-subheader>
-                <md-list-item class="secondary-button-padding">
-                    <div ng-repeat="station in stations">
-                        <p>{{station.name}}</p>
-                        <md-button class="md-secondary" ng-click="doSecondaryAction($event)">More Info</md-button>
-                        <br />
-                    </div>
-                </md-list-item>
-                -->
-
             </md-tab-body>
         </md-tab>
 
@@ -209,29 +172,46 @@
         <md-tab id="geoLocated">
             <md-tab-label>Geo Located</md-tab-label>
             <md-tab-body>
-                <div class="form-in-tab">
-                    <div>
-                        <form name="geoLocatedForm">
-                            <div layout="row" class="md-padding">
-                                <md-slider-container flex class="md-padding" style="margin-top: 25px">
-                                    <md-slider flex md-discrete class="md-primary" ng-model="geoLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
-                                </md-slider-container>
-                                <md-input-container flex class="md-padding">
-                                    <label>Kraftstoffart / Sort of fuel</label>
-                                    <md-select ng-model="geoLocated_type">
-                                        <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
-                                    </md-select>
-                                </md-input-container>
-                            </div>
+                <form name="geoLocatedForm">
+                    <md-grid-list md-cols="5" md-gutter="1em" md-row-height="70px">
+                        <md-grid-tile md-rowspan="2" md-colspan="1">
+                            <md-slider-container flex style="margin-top: 25px">
+                                <md-slider flex md-discrete class="md-primary" ng-model="$parent.$parent.geoLocated_rad" name="rad" value="{{rad}}" step="1" min="0" max="25"></md-slider>
+                            </md-slider-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="2" md-colspan="1">
+                            <md-input-container flex>
+                                <label>Kraftstoffart / Sort of fuel</label>
+                                <md-select ng-model="$parent.$parent.geoLocated_type">
+                                    <md-option ng-repeat="type in types" value="{{type.name}}">{{type.desc}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="2" md-colspan="3">
+                            <md-input-container flex>
+                                <label>Ergebnisliste</label>
+                                <md-select ng-model="station" placeholder="Select fuel station" style="width: 500px">
+                                    <md-option ng-value="station.name" ng-repeat="station in stations">Tankstelle: {{station.name}} // Preis: {{station.price}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
+                            <md-input-container flex>
+                                <label>Sortieren nach / Sort by</label>
+                                <md-select ng-model="$parent.$parent.geoLocated_sort">
+                                    <md-option ng-repeat="sort in sorts" value="{{sort.name}}">{{sort.desc}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-button class="md-primary md-raised" ng-click="geoLocatedPrice()" type="submit">Send request</md-button>
-                        </form>
-                    </div>
-                </div>
-                <div class="description-in-tab">
-                    <p>Description</p>
-                    <p>When the user clicks the button, the RESTful service is invoked. This service requests the users current location by using the Google
-                        Geolocation API. With the received data (latitude and longitude) the service requests the current fuel prices in the area.</p>
-                </div>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="3">
+                            <p>When the user clicks the button, the RESTful service is invoked. This service requests the users current location by using the Google
+                                Geolocation API. With the received data (latitude and longitude) the service requests the current fuel prices in the area.</p>
+                        </md-grid-tile>
+                    </md-grid-list>
+                </form>
             </md-tab-body>
         </md-tab>
     </md-tabs>

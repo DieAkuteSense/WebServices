@@ -1,18 +1,22 @@
 package fuelPriceService;
 
 import resources.Config;
-import resources.ConfigData;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-
 import javax.jws.WebService;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +32,35 @@ public class FuelPriceBackend implements IFuelPriceBackend{
     public static final int RADIUS = 2;
     public static final String TYPE = "diesel";
     public static final String SORT = "price";
-    private final WebTarget wt;
+    private final  WebTarget wt;
 
     /**
      * Configuration end
      */
 
     public FuelPriceBackend() {
-        final Client client = ClientBuilder.newClient();
+        SSLContext sc;
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (GeneralSecurityException e) {
+            sc = null;
+        }
+        final Client client = ClientBuilder.newBuilder().sslContext(sc).build();
         wt = client.target(TANKERKOENIG_API_URL).queryParam("apikey", TANKERKOENIG_API_KEY);
     }
 
@@ -50,6 +75,8 @@ public class FuelPriceBackend implements IFuelPriceBackend{
                 .queryParam("type", type)
                 .request()
                 .get();
+
+
         final JsonObject jsonObject = Json.createReader(response.readEntity(InputStream.class)).readObject();
         getStations(jsonObject.getJsonArray("stations"));
         return jsonObject;
