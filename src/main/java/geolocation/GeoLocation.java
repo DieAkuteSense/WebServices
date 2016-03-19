@@ -1,29 +1,21 @@
 package geolocation;
 
-import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.SystemDefaultCredentialsProvider;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 
-import javax.json.JsonObject;
 import javax.jws.WebService;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * BACKEND
+ * Requests the users current location by locating the devices IP
+ * on mobile devices the accuracy could be optimized (not implemented in this application)
+ */
 @WebService
 public class GeoLocation {
     public static final String GEOLOCATION_API_URL = "https://www.googleapis.com/geolocation/v1/geolocate";
@@ -34,6 +26,10 @@ public class GeoLocation {
     public GeoLocation() {
     }
 
+    /**
+     * prepares and requests the useres current location by using the Google Geolocation API
+     * @return Double array {latitude, longitude}
+     */
     @Path("/geoLocation")
     @POST
     public Double[] requestLocation() {
@@ -71,6 +67,10 @@ public class GeoLocation {
         return coordinates;
     }
 
+    /**
+     * parses the Json Object and extracts the latitude and longiture
+     * @param input response of the google API
+     */
     private void parseInput(String input) {
         for(int i = 0; i < input.length()-2; i++) {
             if(input.substring(i, i+3).equals("lat")) {

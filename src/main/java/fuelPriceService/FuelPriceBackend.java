@@ -20,6 +20,12 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * BACKEND
+ * This backend interprets the requests from the frontend (web client), prepares and sends the request to https://creativecommons.tankerkoenig.de
+ * The response is parsed and send to the web client
+ *
+ */
 @WebService
 public class FuelPriceBackend implements IFuelPriceBackend{
     /**
@@ -33,13 +39,17 @@ public class FuelPriceBackend implements IFuelPriceBackend{
     public static final String TYPE = "diesel";
     public static final String SORT = "price";
     private final  WebTarget wt;
-
     /**
      * Configuration end
      */
 
+    /**
+     * prepare the web target client to send the request to the Tankerkoenig-API
+     * the ssl verification is disabled because of a missing certificate in the default java keystore
+     */
     public FuelPriceBackend() {
         SSLContext sc;
+        // disable SSL verification (https://creativecommons.tankerkoenig.de certificate is per default not trusted because it is not in java keystore
         TrustManager[] trustAllCerts = new TrustManager[] {
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -64,6 +74,15 @@ public class FuelPriceBackend implements IFuelPriceBackend{
         wt = client.target(TANKERKOENIG_API_URL).queryParam("apikey", TANKERKOENIG_API_KEY);
     }
 
+    /**
+     * Requests the current fuel price with the Tankerkoenig-API
+     * @param lat Latitude of the requested position
+     * @param lon Longitude of the requested position
+     * @param rad Radius: Specifies the area to search for gas stations
+     * @param type Specifies the fuel type, possible values: e5, e10, diesel, all
+     * @param sort Specifies the sorting of the result, possible values: dist, price
+     * @return
+     */
     @SuppressWarnings("ValidExternallyBoundObject")
     @Override
     public JsonObject requestCurrentFuelPrice(double lat, double lon, int rad, String type, String sort) {

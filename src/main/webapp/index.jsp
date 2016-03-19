@@ -22,6 +22,7 @@
         angular
                 .module('frontend', ['ngMaterial'])
                 .controller('frontendCtrl', function($scope, $mdDialog, $http) {
+                    // Fill dropdown list to select fuel type
                     $scope.types = [
                         {name: 'e10', desc: 'Super (E10)'},
                         {name: 'e5', desc: 'Super (E5)'},
@@ -29,13 +30,11 @@
                         {name: 'all', desc: 'Alle Kraftstoffe'}
                     ];
 
+                    // Fill dropdown list to select the sorting
                     $scope.sorts = [
                         {name: 'dist', desc: 'Distanz'},
                         {name: 'price', desc: 'Preis'}
-                    ]
-
-                    $scope.labels = null;
-                    $scope.label = null;
+                    ];
 
                     $scope.ngInit = function() {
                         var client = new XMLHttpRequest();
@@ -52,11 +51,22 @@
                         };
                     };
 
+                    // requests the geo located price service
+                    // RESTful service URI: /services/rest/geoLocatedPrice
                     $scope.geoLocatedPrice = function() {
 
+                        // prevent null pointer exception if user have not selected values
+                        if($scope.geoLocated_rad == undefined) {
+                            $scope.geoLocated_rad = "10";
+                        }
+                        if($scope.geoLocated_type == undefined) {
+                            $scope.geoLocated_type = "all";
+                        }
+                        if($scope.geoLocated_sort == undefined) {
+                            $scope.geoLocated_sort = "dist";
+                        }
 
-
-                        var data = null;
+                        // set header and send request, fill dropdown list with result
                         var priceClient = new XMLHttpRequest();
                         priceClient.open('POST', '/priceService/services/rest/geoLocatedPrice');
                         priceClient.setRequestHeader('rad', $scope.geoLocated_rad);
@@ -65,13 +75,28 @@
                         priceClient.send();
                         priceClient.onreadystatechange = function() {
                             if(priceClient.readyState == 4) {
-                                data = priceClient.responseText
-                                $scope.stations = $.parseJSON(data).stations;
+                                var data = priceClient.responseText
+                                $scope.geoStations = $.parseJSON(data).stations;
                             }
                         };
                     };
 
+                    // requests the user located price service
+                    // RESTful service URI: /services/rest/userLocatedPrice
                     $scope.userLocatedPrice = function() {
+
+                        // prevent if user have not selected values
+                        if($scope.userLocated_rad == undefined) {
+                            $scope.userLocated_rad = "10";
+                        }
+                        if($scope.userLocated_type == undefined) {
+                            $scope.userLocated_type = "all";
+                        }
+                        if($scope.userLocated_sort == undefined) {
+                            $scope.userLocated_sort = "dist";
+                        }
+
+                        // set header and send request, fill dropdown list with result
                         var priceClient = new XMLHttpRequest();
                         priceClient.open('POST', '/priceService/services/rest/userLocatedPrice');
                         priceClient.setRequestHeader('lat', $scope.userLocated_lat);
@@ -83,7 +108,7 @@
                         priceClient.onreadystatechange = function() {
                             if(priceClient.readyState == 4) {
                                 var data = priceClient.responseText;
-                                $scope.stations = $.parseJSON(data).stations;
+                                $scope.userStations = $.parseJSON(data).stations;
                             }
                         };
                     };
@@ -132,10 +157,8 @@
                                 </div>
                             </md-input-container>
                         </md-grid-tile>
-                        <md-grid-tile md-rowspan="3" md-colspan="3">
-                            <md-grid-tile-footer>
-                                <h3>Response</h3>
-                            </md-grid-tile-footer>
+                        <md-grid-tile md-rowspan="2" md-colspan="3">
+
                         </md-grid-tile>
                         <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-slider-container flex style="margin-top: 25px">
@@ -150,6 +173,14 @@
                                 </md-select>
                             </md-input-container>
                         </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="3">
+                            <md-input-container flex>
+                                <label>Ergebnisliste</label>
+                                <md-select ng-model="statioUsern" placeholder="Select fuel station" style="width: 500px">
+                                    <md-option ng-value="stationUser.name" ng-repeat="station in userStations">Tankstelle: {{station.name}} // Preis: {{station.price}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-grid-tile>
                         <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-input-container flex>
                                 <label>Sortieren nach / Sort by</label>
@@ -160,6 +191,9 @@
                         </md-grid-tile>
                         <md-grid-tile md-rowspan="1" md-colspan="1">
                             <md-button class="md-primary md-raised" ng-click="userLocatedPrice()" type="submit">Send request</md-button>
+                        </md-grid-tile>
+                        <md-grid-tile md-rowspan="1" md-colspan="3">
+                            <p>When the user clicks the button, the RESTful service is invoked. This service requests the current fuel prices in the area that the user has specified.</p>
                         </md-grid-tile>
                     </md-grid-list>
                 </form>
@@ -191,7 +225,7 @@
                             <md-input-container flex>
                                 <label>Ergebnisliste</label>
                                 <md-select ng-model="station" placeholder="Select fuel station" style="width: 500px">
-                                    <md-option ng-value="station.name" ng-repeat="station in stations">Tankstelle: {{station.name}} // Preis: {{station.price}}</md-option>
+                                    <md-option ng-value="station.name" ng-repeat="station in geoStations">Tankstelle: {{station.name}} // Preis: {{station.price}}</md-option>
                                 </md-select>
                             </md-input-container>
                         </md-grid-tile>
@@ -216,18 +250,5 @@
         </md-tab>
     </md-tabs>
 </md-content>
-
-<br />
-<hr />
-<br />
-
-<div style="background-color: #eff0f1; padding: 20px">
-    <b>Geo Located request. Result loaded in drop down list. Request is invoked when drop down list is opened.</b>
-    <md-select ng-model="label" placeholder="Select fuel station" md-on-open="ngInit()" style="width: 500px">
-        <md-option ng-value="label.name" ng-repeat="label in labels">Tankstelle: {{label.name}} // Preis: {{label.price}}</md-option>
-    </md-select>
-</div>
-
-
 </body>
 </html>
