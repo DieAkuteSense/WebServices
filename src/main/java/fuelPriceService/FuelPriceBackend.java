@@ -20,8 +20,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-// Freds branch
-
 @WebService
 public class FuelPriceBackend implements IFuelPriceBackend{
     /**
