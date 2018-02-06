@@ -32,7 +32,7 @@ public class FuelPriceBackend implements IFuelPriceBackend{
      * Configuration
      */
     public static final String TANKERKOENIG_API_URL = "https://creativecommons.tankerkoenig.de/json/list.php";
-    public static final String TANKERKOENIG_API_KEY = "671b939e-08ee-8807-be55-e1bd540c210b"; // get your own API key under https://creativecommons.tankerkoenig.de/#register
+    public static final String TANKERKOENIG_API_KEY = ""; // get your own API key under https://creativecommons.tankerkoenig.de/#register
     public static final double CITY_LAT = 48.8088277717712;
     public static final double CITY_LON = 9.224395751953125;
     public static final int RADIUS = 2;
