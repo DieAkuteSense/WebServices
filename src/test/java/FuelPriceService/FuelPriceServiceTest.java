@@ -1,6 +1,9 @@
-package fuelPriceService;
+package FuelPriceService;
 
 import org.junit.Test;
+
+import fuelPriceService.FuelPriceBackend;
+
 import static org.junit.Assert.*;
 import javax.json.JsonObject;
 
